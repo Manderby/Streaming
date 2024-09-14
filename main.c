@@ -155,6 +155,21 @@ struct PersonManager {
   Person* person[ARRAY_COUNT];
 };
 
+NABool validateManager(const PersonManager* manager) {
+  NABool valid = manager != NULL;
+  if(!valid)
+      printf("Manager object is NULL\n");
+  return valid;
+}
+NABool validateIndex(size_t index) {
+  NABool valid = index < ARRAY_COUNT;
+  if(!valid)
+      printf("Index out of bounds\n");
+  return valid;
+}
+
+
+
 PersonManager* createPersonManager() {
   PersonManager* manager = malloc(sizeof(PersonManager));
   for(size_t i = 0; i < ARRAY_COUNT; ++i) {
@@ -164,10 +179,8 @@ PersonManager* createPersonManager() {
 }
 
 void setManagerPerson(PersonManager* manager, Person* person, size_t index) {
-  if(index >= ARRAY_COUNT) {
-    printf("Index out of bounds\n");
+  if(!validateIndex(index))
     return;
-  }
     
   if(manager->person[index] != NULL) {
     printf("There is already a person at index %d\n", (int)index);
@@ -178,20 +191,18 @@ void setManagerPerson(PersonManager* manager, Person* person, size_t index) {
 }
 
 const Person* getManagerPerson(PersonManager* manager, size_t index) {
-  if(index >= ARRAY_COUNT) {
-    printf("Index out of bounds\n");
+  if(!validateManager(manager))
     return NULL;
-  }
+  if(!validateIndex(index))
+    return NULL;
   
   return manager->person[index];
 }
 
 
 void setManagerFriendship(PersonManager* manager, size_t indexA, size_t indexB) {
-  if(indexA >= ARRAY_COUNT || indexB >= ARRAY_COUNT) {
-    printf("Index out of bounds\n");
+  if(!validateIndex(indexA) || !validateIndex(indexB))
     return;
-  }
 
   if(manager->person[indexA] == NULL || manager->person[indexB] == NULL) {
     printf("Friendship not possible, as persons do not exists.\n");
@@ -203,20 +214,16 @@ void setManagerFriendship(PersonManager* manager, size_t indexA, size_t indexB) 
 }
 
 void printManagerPerson(PersonManager* manager, size_t index) {
-  if(index >= ARRAY_COUNT) {
-    printf("Index out of bounds\n");
+  if(!validateIndex(index))
     return;
-  }
 
   printPerson(manager->person[index]);
 }
 
 
 void deleteManagerPerson(PersonManager* manager, size_t index) {
-  if(index >= ARRAY_COUNT) {
-    printf("Index out of bounds\n");
+  if(!validateIndex(index))
     return;
-  }
 
   if(manager->person[index] == NULL)
     return;
@@ -252,9 +259,12 @@ void deletePersonManager(PersonManager* manager) {
 
 void test() {
   PersonManager* manager = createPersonManager();
+  if(getManagerPerson(NULL, 0) != NULL) {printf("Error\n");}
   if(getManagerPerson(manager, 0) != NULL) {printf("Error\n");}
   if(getManagerPerson(manager, 1) != NULL) {printf("Error\n");}
-  if(getManagerPerson(manager, 2) != NULL) {printf("Error\n");}
+  if(getManagerPerson(manager, ARRAY_COUNT) != NULL) {printf("Error\n");}
+  
+  deletePersonManager(manager);
 }
 
 
@@ -263,23 +273,23 @@ void test() {
 
 int main() {
   test();
-//
-//
-//  PersonManager* manager = createPersonManager();
-//  
-//  setManagerPerson(manager, createPerson("Alice"), 0);
-//  setManagerPerson(manager, createPerson("Bob"), 1);
-//
-//  setManagerFriendship(manager, 0, 1);
-//
-//	printManagerPerson(manager, 0);
-//	printManagerPerson(manager, 1);
-//
-//  deleteManagerPerson(manager, 1);
-//
-//	printManagerPerson(manager, 0);
-//
-//  deletePersonManager(manager);
+
+
+  PersonManager* manager = createPersonManager();
+  
+  setManagerPerson(manager, createPerson("Alice"), 0);
+  setManagerPerson(manager, createPerson("Bob"), 1);
+
+  setManagerFriendship(manager, 0, 1);
+
+	printManagerPerson(manager, 0);
+	printManagerPerson(manager, 1);
+
+  deleteManagerPerson(manager, 1);
+
+	printManagerPerson(manager, 0);
+
+  deletePersonManager(manager);
 
 	return 0;
 }
